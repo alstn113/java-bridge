@@ -15,14 +15,16 @@ import java.util.List;
 public class BridgeGame {
 
     private final Bridge bridge;
-
-    private final int totalAttempts;
+    private int totalAttempts;
     private List<String> history;
+    private boolean isFailed;
+
 
     public BridgeGame(Bridge bridge) {
         this.bridge = bridge;
         this.totalAttempts = 1;
         this.history = new ArrayList<>();
+        this.isFailed = false;
     }
 
 
@@ -31,12 +33,27 @@ public class BridgeGame {
      * <p>
      * 이동을 위해 필요한 메서드의 반환 타입(return type), 인자(parameter)는 자유롭게 추가하거나 변경할 수 있다.
      */
-    public void move(String moving) {
-        if (moving.equals(BridgeConstant.UP) || moving.equals(BridgeConstant.DOWN)) {
-            this.history.add(moving);
-        } else {
-            throw new InvalidInputException(ErrorMessage.INVALID_MOVING_COMMAND);
+    public boolean move(String moving) {
+        validateMovingCommand(moving);
+
+        this.history.add(moving);
+        if (!isCorrectMove(moving)) {
+            this.isFailed = true;
+            return false;
         }
+        return true;
+    }
+
+    private void validateMovingCommand(String moving) {
+        if (moving.equals(BridgeConstant.UP) || moving.equals(BridgeConstant.DOWN)) {
+            return;
+        }
+        throw new InvalidInputException(ErrorMessage.INVALID_MOVING_COMMAND);
+    }
+
+    private boolean isCorrectMove(String moving) {
+        int currentIndex = this.history.size();
+        return bridge.getLayout().get(currentIndex).equals(moving);
     }
 
 
@@ -46,6 +63,9 @@ public class BridgeGame {
      * 재시작을 위해 필요한 메서드의 반환 타입(return type), 인자(parameter)는 자유롭게 추가하거나 변경할 수 있다.
      */
     public void retry() {
+        this.history = new ArrayList<>();
+        this.totalAttempts += 1;
+        this.isFailed = false;
     }
 
     public List<String> getHistory() {
@@ -53,20 +73,24 @@ public class BridgeGame {
     }
 
     public boolean isWin() {
-        return true;
+        return this.history.size() == this.bridge.getLength() && !this.isFailed;
     }
 
-    public boolean isEnd() {
-        return true;
+    public int getTotalAttempts() {
+        return this.totalAttempts;
     }
 
     public boolean isRetry(String command) {
         if (command.equals(BridgeConstant.RETRY)) {
-            this.retry();
+            retry();
             return true;
         } else if (command.equals(BridgeConstant.QUIT)) {
             return false;
         }
         throw new InvalidInputException(ErrorMessage.INVALID_GAME_COMMAND);
+    }
+
+    public boolean getIsFailed() {
+        return this.isFailed;
     }
 }
