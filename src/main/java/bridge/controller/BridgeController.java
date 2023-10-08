@@ -9,35 +9,48 @@ public class BridgeController {
     private final InputView inputView;
     private final OutputView outputView;
 
+    private BridgeGame bridgeGame;
+    private Bridge bridge;
+
     public BridgeController(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
-
     }
 
-    public void run() {
-        outputView.printStartMessage();
-
-        // 다리 길이 입력
-        Bridge bridge = new Bridge(inputView.readBridgeSize());
-        BridgeGame bridgeGame = new BridgeGame(bridge);
-
-        // 다리 이동
+    public void progress() {
         while (true) {
-            bridgeGame.move(inputView.readMoving()); // TODO: moving validate
-            outputView.printMap(bridgeGame.getHistory());
-
-            if (!bridgeGame.isEnd()) continue;
+            move();
 
             if (bridgeGame.isWin()) break;
-
-            if (bridgeGame.isRetry(inputView.readGameCommand())) {
-                bridgeGame.retry();
-            }
+            if (bridgeGame.isEnd() && isRetry()) continue;
         }
-
-        outputView.printResult();
-
-
     }
+
+    public void printStartMessage() {
+        outputView.printStartMessage();
+    }
+
+    public void printResult() {
+        outputView.printResult();
+    }
+
+    public void makeBridge() {
+        inputView.retryOnException(() -> {
+            bridge = new Bridge(inputView.readBridgeSize());
+            bridgeGame = new BridgeGame(bridge);
+        });
+    }
+
+    private void move() {
+        inputView.retryOnException(() -> {
+            bridgeGame.move(inputView.readMoving());
+            outputView.printMap(bridgeGame.getHistory());
+        });
+    }
+
+    private boolean isRetry() {
+        return inputView.retryOnException(() -> bridgeGame.isRetry(inputView.readGameCommand()));
+    }
+
+
 }

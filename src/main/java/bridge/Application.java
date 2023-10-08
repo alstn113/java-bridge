@@ -5,11 +5,15 @@ import bridge.view.InputView;
 import bridge.view.OutputView;
 
 public class Application {
-
     public static void main(String[] args) {
-        new BridgeController(
+        BridgeController bridgeController = new BridgeController(
                 new InputView(),
                 new OutputView()
-        ).run();
+        );
+
+        bridgeController.printStartMessage();
+        bridgeController.makeBridge();
+        bridgeController.progress();
+        bridgeController.printResult();
     }
 }

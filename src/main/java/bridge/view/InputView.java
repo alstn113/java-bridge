@@ -1,6 +1,7 @@
 package bridge.view;
 
 import bridge.constant.ErrorMessage;
+import bridge.exception.AppException;
 import bridge.exception.InvalidInputException;
 import camp.nextstep.edu.missionutils.Console;
 
@@ -9,8 +10,14 @@ import camp.nextstep.edu.missionutils.Console;
  * 사용자로부터 입력을 받는 역할을 한다.
  */
 public class InputView {
+    private OutputView outputView;
+
+    public InputView() {
+        this.outputView = new OutputView();
+    }
+
     private String read(String query) {
-        System.out.println(query);
+        outputView.print(query);
         return Console.readLine();
     }
 
@@ -41,6 +48,37 @@ public class InputView {
      */
     public String readGameCommand() {
         return this.read("게임을 다시 시도할지 여부를 입력해주세요. (재시도: R, 종료: Q)");
+    }
+
+    public <T> T retryOnException(InputFunction<T> inputFunction) {
+        while (true) {
+            try {
+                return inputFunction.handleInput();
+            } catch (AppException e) {
+                outputView.printErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    public void retryOnException(VoidInputFunction inputFunction) {
+        while (true) {
+            try {
+                inputFunction.handleInput();
+                return;
+            } catch (AppException e) {
+                outputView.printErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface InputFunction<T> {
+        T handleInput() throws AppException;
+    }
+
+    @FunctionalInterface
+    public interface VoidInputFunction {
+        void handleInput() throws AppException;
     }
 
 }
