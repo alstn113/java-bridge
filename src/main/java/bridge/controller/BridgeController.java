@@ -12,6 +12,7 @@ public class BridgeController {
     public BridgeController(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
+
     }
 
     public void run() {

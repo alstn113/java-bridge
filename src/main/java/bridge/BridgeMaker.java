@@ -33,6 +33,6 @@ public class BridgeMaker {
     }
 
     private String convertToPosition(int number) {
-        return number == 0 ? BridgeConstant.UP : BridgeConstant.DOWN;
+        return number == 0 ? BridgeConstant.DOWN : BridgeConstant.UP;
     }
 }

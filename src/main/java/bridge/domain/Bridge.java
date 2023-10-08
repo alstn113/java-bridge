@@ -12,16 +12,17 @@ public class Bridge {
     private final BridgeMaker bridgeMaker;
     private final List<String> layout;
 
+    public Bridge(int length) {
+        this(length, new BridgeMaker());
+    }
+
     public Bridge(int length, BridgeMaker bridgeMaker) {
         this.length = length;
         this.bridgeMaker = bridgeMaker;
         this.layout = this.bridgeMaker.makeBridge(length);
-        this.validate(length);
+        validate(length);
     }
 
-    public Bridge(int length) {
-        this(length, new BridgeMaker());
-    }
 
     public int getLength() {
         return length;
