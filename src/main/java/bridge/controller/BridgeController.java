@@ -19,11 +19,9 @@ public class BridgeController {
 
     public void progress() {
         while (true) {
-
-            if (move()) continue;
-
+            move();
             if (bridgeGame.isWin()) break;
-            if (!isRetry()) break;
+            if (bridgeGame.isFailed() && !isRetry()) break;
         }
     }
 
@@ -32,7 +30,11 @@ public class BridgeController {
     }
 
     public void printResult() {
-        outputView.printResult();
+        outputView.printResult(
+                bridgeGame.getHistory(),
+                bridgeGame.isFailed(),
+                bridgeGame.getTotalAttempts()
+        );
     }
 
     public void makeBridge() {
@@ -42,11 +44,10 @@ public class BridgeController {
         });
     }
 
-    private boolean move() {
-        return inputView.retryOnException(() -> {
-            boolean isCorrect = bridgeGame.move(inputView.readMoving());
-            outputView.printMap(bridgeGame.getHistory(), bridgeGame.getIsFailed());
-            return isCorrect;
+    private void move() {
+        inputView.retryOnException(() -> {
+            bridgeGame.move(inputView.readMoving());
+            outputView.printMap(bridgeGame.getHistory(), bridgeGame.isFailed());
         });
     }
 
