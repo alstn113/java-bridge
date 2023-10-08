@@ -8,13 +8,11 @@ package bridge.domain;
 public class BridgeGame {
 
     private final Bridge bridge;
-    private final Player player;
 
     private int totalAttempts;
 
-    public BridgeGame(Bridge bridge, Player player) {
+    public BridgeGame(Bridge bridge) {
         this.bridge = bridge;
-        this.player = player;
         this.totalAttempts = 0;
     }
 
