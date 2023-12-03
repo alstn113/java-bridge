@@ -13,6 +13,5 @@ public class BridgeController {
     }
 
     public void run() {
-        // TODO 구현 진행
     }
 }
