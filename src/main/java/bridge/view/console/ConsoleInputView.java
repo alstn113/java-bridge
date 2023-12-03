@@ -7,6 +7,7 @@ import camp.nextstep.edu.missionutils.Console;
 public class ConsoleInputView implements InputView {
     @Override
     public int readBridgeSize() {
+        System.out.println();
         System.out.println("다리의 길이를 입력해주세요.");
         String input = Console.readLine();
         return InputUtil.parseToInt(input);
