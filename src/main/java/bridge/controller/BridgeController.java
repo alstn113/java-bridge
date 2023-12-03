@@ -1,6 +1,9 @@
 package bridge.controller;
 
+import bridge.domain.BridgeGame;
 import bridge.domain.BridgeMaker;
+import bridge.domain.GameCommand;
+import bridge.domain.Moving;
 import bridge.view.InputView;
 import bridge.view.OutputView;
 import bridge.view.util.InputUtil;
@@ -18,12 +21,29 @@ public class BridgeController {
     public void run() {
         printGameStartMessage();
         List<String> bridge = createBridge();
+        BridgeGame bridgeGame = new BridgeGame(bridge);
 
-        while (true) {
-            // 이동 반복
-            // 실패 시 재시도 여부 확인
-            // 성공 시 최종 게임 결과 확인, 시도 횟수
+        while (!bridgeGame.isCleared()) {
+            Moving moving = readMoving();
+            bridgeGame.move(moving);
+            printMap(bridgeGame);
+
+            if (bridgeGame.isFailed() && !isRetry(bridgeGame)) {
+                break;
+            }
         }
+
+        printResult(bridgeGame);
+    }
+
+    private boolean isRetry(BridgeGame bridgeGame) {
+        GameCommand gameCommand = readGameCommand();
+        boolean retry = gameCommand == GameCommand.RETRY;
+        if (retry) {
+            bridgeGame.retry();
+            return true;
+        }
+        return false;
     }
 
     private List<String> createBridge() {
@@ -35,7 +55,30 @@ public class BridgeController {
         });
     }
 
+    private Moving readMoving() {
+        return InputUtil.retryOnException(() -> {
+            String input = inputView.readMoving();
+            return Moving.of(input);
+        });
+    }
+
+    private GameCommand readGameCommand() {
+        return InputUtil.retryOnException(() -> {
+            String input = inputView.readGameCommand();
+            return GameCommand.of(input);
+        });
+    }
+
     private void printGameStartMessage() {
         outputView.printGameStartMessage();
+    }
+
+    private void printMap(BridgeGame bridgeGame) {
+        outputView.printMap(bridgeGame.getBridge(), bridgeGame.getCurrentPosition(), bridgeGame.isFailed());
+    }
+
+    private void printResult(BridgeGame bridgeGame) {
+        outputView.printResult(bridgeGame.getBridge(), bridgeGame.getCurrentPosition(), bridgeGame.isCleared(),
+                bridgeGame.getTryCount());
     }
 }
