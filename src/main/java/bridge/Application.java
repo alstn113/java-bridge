@@ -1,8 +1,14 @@
 package bridge;
 
-public class Application {
+import bridge.controller.BridgeController;
+import bridge.view.console.ConsoleInputView;
+import bridge.view.console.ConsoleOutputView;
 
+public class Application {
     public static void main(String[] args) {
-        // TODO: 프로그램 구현
+        new BridgeController(
+                new ConsoleInputView(),
+                new ConsoleOutputView()
+        ).run();
     }
 }
